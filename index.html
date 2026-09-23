@@ -1,0 +1,1104 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#3157d5">
+<title>Control de Deudas</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:#f4f7fb;
+  color:#172033;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+.container{
+  max-width:1000px;
+  margin:auto;
+  padding:18px;
+}
+
+.hero{
+  background:linear-gradient(135deg,#182968,#3157d5);
+  color:white;
+  border-radius:24px;
+  padding:25px;
+  margin-bottom:16px;
+}
+
+.hero h1{
+  margin:0 0 7px;
+  font-size:30px;
+}
+
+.hero p{
+  margin:0;
+  opacity:.85;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+
+.card{
+  background:white;
+  border:1px solid #e4e9f2;
+  border-radius:18px;
+  padding:18px;
+  margin-top:16px;
+  box-shadow:0 7px 25px rgba(23,32,51,.06);
+}
+
+.stat{
+  margin:0;
+}
+
+.stat-label{
+  color:#68758a;
+  font-size:13px;
+}
+
+.stat-value{
+  font-size:24px;
+  font-weight:800;
+  margin-top:6px;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+label{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:5px;
+  color:#58667c;
+}
+
+input,select{
+  width:100%;
+  padding:12px;
+  border:1px solid #d7deea;
+  border-radius:11px;
+  background:white;
+  font:inherit;
+}
+
+button{
+  border:0;
+  border-radius:11px;
+  padding:11px 15px;
+  font:inherit;
+  font-weight:750;
+  cursor:pointer;
+}
+
+.primary{
+  background:#3157d5;
+  color:white;
+}
+
+.secondary{
+  background:#eef2f8;
+  color:#26344d;
+}
+
+.danger{
+  background:#fff0f2;
+  color:#a42e42;
+}
+
+.debt{
+  border:1px solid #e4e9f2;
+  border-radius:16px;
+  padding:16px;
+  margin:12px 0;
+}
+
+.debt-header{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+}
+
+.debt-name{
+  font-weight:800;
+  font-size:17px;
+}
+
+.muted{
+  color:#68758a;
+  font-size:13px;
+}
+
+.balance{
+  font-size:20px;
+  font-weight:800;
+}
+
+.progress{
+  height:9px;
+  background:#e8ecf3;
+  border-radius:10px;
+  overflow:hidden;
+  margin:13px 0;
+}
+
+.progress-bar{
+  height:100%;
+  background:#3157d5;
+}
+
+.badge{
+  display:inline-block;
+  background:#eef2ff;
+  color:#3157d5;
+  border-radius:8px;
+  padding:5px 8px;
+  font-size:12px;
+  font-weight:700;
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.message{
+  padding:12px;
+  border-radius:10px;
+  margin-top:12px;
+  background:#eef2ff;
+}
+
+.success{
+  background:#eaf8f2;
+  color:#176b4a;
+}
+
+.error{
+  background:#fff0f2;
+  color:#a42e42;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,td{
+  text-align:left;
+  padding:10px;
+  border-bottom:1px solid #edf0f5;
+}
+
+.empty{
+  text-align:center;
+  padding:25px;
+  color:#68758a;
+}
+
+@media(max-width:750px){
+  .grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .debt-header{
+    flex-direction:column;
+  }
+}
+
+@media(max-width:430px){
+  .container{
+    padding:12px;
+  }
+
+  .hero{
+    padding:21px;
+  }
+
+  .hero h1{
+    font-size:26px;
+  }
+
+  .grid{
+    gap:8px;
+  }
+
+  .card{
+    padding:15px;
+  }
+
+  .stat-value{
+    font-size:19px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<section class="hero">
+  <h1>Control de Deudas</h1>
+  <p>Administra tus deudas, abonos, intereses y próximos pagos.</p>
+</section>
+
+<section class="grid">
+
+<div class="card stat">
+  <div class="stat-label">Saldo total</div>
+  <div class="stat-value" id="totalSaldo">$0</div>
+</div>
+
+<div class="card stat">
+  <div class="stat-label">Total pagado</div>
+  <div class="stat-value" id="totalPagado">$0</div>
+</div>
+
+<div class="card stat">
+  <div class="stat-label">Pagos mensuales</div>
+  <div class="stat-value" id="totalMensual">$0</div>
+</div>
+
+<div class="card stat">
+  <div class="stat-label">Intereses pagados</div>
+  <div class="stat-value" id="totalIntereses">$0</div>
+</div>
+
+</section>
+
+
+<section class="card">
+
+<h2>Agregar deuda</h2>
+
+<div class="form-grid">
+
+<div>
+<label>Nombre de la deuda</label>
+<input id="nombre" placeholder="Ej. Tarjeta BBVA">
+</div>
+
+<div>
+<label>Tipo</label>
+<select id="tipo">
+<option>Tarjeta</option>
+<option>Préstamo</option>
+<option>Crédito</option>
+<option>Persona</option>
+<option>Hipoteca</option>
+<option>Otro</option>
+</select>
+</div>
+
+<div>
+<label>Monto original</label>
+<input id="original" type="number" step="0.01" placeholder="50000">
+</div>
+
+<div>
+<label>Saldo actual</label>
+<input id="saldo" type="number" step="0.01" placeholder="35000">
+</div>
+
+<div>
+<label>Pago mensual</label>
+<input id="mensual" type="number" step="0.01" placeholder="2500">
+</div>
+
+<div>
+<label>Interés anual (%)</label>
+<input id="interes" type="number" step="0.01" placeholder="35">
+</div>
+
+<div>
+<label>Próximo vencimiento</label>
+<input id="vencimiento" type="date">
+</div>
+
+</div>
+
+<br>
+
+<button class="primary" onclick="agregarDeuda()">
+Guardar deuda
+</button>
+
+<div id="mensaje"></div>
+
+</section>
+
+
+<section class="card">
+
+<h2>Mis deudas</h2>
+
+<div id="listaDeudas"></div>
+
+</section>
+
+
+<section class="card">
+
+<h2>Registrar abono</h2>
+
+<div class="form-grid">
+
+<div>
+<label>Deuda</label>
+<select id="deudaAbono"></select>
+</div>
+
+<div>
+<label>Monto del abono</label>
+<input id="montoAbono" type="number" step="0.01">
+</div>
+
+<div>
+<label>Interés incluido</label>
+<input id="interesAbono" type="number" step="0.01" value="0">
+</div>
+
+<div>
+<label>Fecha</label>
+<input id="fechaAbono" type="date">
+</div>
+
+</div>
+
+<br>
+
+<button class="primary" onclick="registrarAbono()">
+Registrar abono
+</button>
+
+<div id="mensajeAbono"></div>
+
+</section>
+
+
+<section class="card">
+
+<h2>Recordatorio por WhatsApp</h2>
+
+<div class="form-grid">
+
+<div>
+<label>Deuda</label>
+<select id="deudaWhatsApp"></select>
+</div>
+
+<div>
+<label>Número WhatsApp</label>
+<input id="telefono" placeholder="+521XXXXXXXXXX">
+</div>
+
+<div>
+<label>Fecha del recordatorio</label>
+<input id="fechaWhatsApp" type="datetime-local">
+</div>
+
+<div>
+<label>Antelación</label>
+<select id="antelacion">
+<option value="0">El mismo día</option>
+<option value="1">1 día antes</option>
+<option value="3">3 días antes</option>
+<option value="7">7 días antes</option>
+</select>
+</div>
+
+</div>
+
+<br>
+
+<label>
+<input id="consentimiento" type="checkbox" style="width:auto">
+ Acepto recibir este recordatorio por WhatsApp.
+</label>
+
+<br><br>
+
+<button class="primary" onclick="programarWhatsApp()">
+Programar WhatsApp
+</button>
+
+<div id="mensajeWhatsApp"></div>
+
+<p class="muted">
+La página está preparada para conectarse con un servidor de WhatsApp.
+El envío automático requiere un servicio como Twilio.
+</p>
+
+</section>
+
+
+<section class="card">
+
+<h2>Calendario de pagos</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>Deuda</th>
+<th>Vencimiento</th>
+<th>Pago</th>
+</tr>
+</thead>
+
+<tbody id="calendario"></tbody>
+
+</table>
+
+</section>
+
+
+<section class="card">
+
+<h2>Historial de abonos</h2>
+
+<div id="historial"></div>
+
+</section>
+
+</div>
+
+
+<script>
+
+const STORAGE_KEY="control_deudas_final";
+
+let deudas=JSON.parse(
+localStorage.getItem(STORAGE_KEY)||"[]"
+);
+
+
+function dinero(valor){
+
+return new Intl.NumberFormat(
+"es-MX",
+{
+style:"currency",
+currency:"MXN",
+maximumFractionDigits:2
+}
+).format(Number(valor)||0);
+
+}
+
+
+function guardar(){
+
+localStorage.setItem(
+STORAGE_KEY,
+JSON.stringify(deudas)
+);
+
+renderizar();
+
+}
+
+
+function id(){
+
+return Date.now().toString(36)+Math.random().toString(36).slice(2);
+
+}
+
+
+function escapar(texto){
+
+return String(texto).replace(
+/[&<>"']/g,
+function(c){
+
+return {
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#39;"
+
+}[c];
+
+});
+
+}
+
+
+function agregarDeuda(){
+
+const deuda={
+
+id:id(),
+
+nombre:document.getElementById("nombre").value.trim(),
+
+tipo:document.getElementById("tipo").value,
+
+original:Number(document.getElementById("original").value)||0,
+
+saldo:Number(document.getElementById("saldo").value)||0,
+
+mensual:Number(document.getElementById("mensual").value)||0,
+
+interes:Number(document.getElementById("interes").value)||0,
+
+vencimiento:document.getElementById("vencimiento").value,
+
+abonos:[]
+
+};
+
+
+if(!deuda.nombre){
+
+mostrar(
+"mensaje",
+"Escribe el nombre de la deuda.",
+"error"
+);
+
+return;
+
+}
+
+
+if(deuda.saldo<=0){
+
+mostrar(
+"mensaje",
+"Indica el saldo actual.",
+"error"
+);
+
+return;
+
+}
+
+
+deudas.push(deuda);
+
+guardar();
+
+document.getElementById("nombre").value="";
+document.getElementById("original").value="";
+document.getElementById("saldo").value="";
+document.getElementById("mensual").value="";
+document.getElementById("interes").value="";
+document.getElementById("vencimiento").value="";
+
+mostrar(
+"mensaje",
+"Deuda guardada correctamente.",
+"success"
+);
+
+}
+
+
+function registrarAbono(){
+
+const idDeuda=document.getElementById("deudaAbono").value;
+
+const monto=Number(
+document.getElementById("montoAbono").value
+)||0;
+
+const interes=Number(
+document.getElementById("interesAbono").value
+)||0;
+
+const fecha=
+document.getElementById("fechaAbono").value
+||new Date().toISOString().slice(0,10);
+
+
+const deuda=deudas.find(
+d=>d.id===idDeuda
+);
+
+
+if(!deuda){
+
+mostrar(
+"mensajeAbono",
+"Selecciona una deuda.",
+"error"
+);
+
+return;
+
+}
+
+
+if(monto<=0){
+
+mostrar(
+"mensajeAbono",
+"Indica un monto válido.",
+"error"
+);
+
+return;
+
+}
+
+
+deuda.abonos.push({
+
+id:id(),
+monto:monto,
+interes:interes,
+fecha:fecha
+
+});
+
+
+deuda.saldo=Math.max(
+0,
+deuda.saldo-(monto-interes)
+);
+
+
+guardar();
+
+
+document.getElementById("montoAbono").value="";
+document.getElementById("interesAbono").value="0";
+
+
+mostrar(
+"mensajeAbono",
+"Abono registrado correctamente.",
+"success"
+);
+
+}
+
+
+function eliminarDeuda(idDeuda){
+
+if(!confirm(
+"¿Seguro que quieres eliminar esta deuda?"
+))return;
+
+
+deudas=deudas.filter(
+d=>d.id!==idDeuda
+);
+
+guardar();
+
+}
+
+
+function editarSaldo(idDeuda){
+
+const deuda=deudas.find(
+d=>d.id===idDeuda
+);
+
+if(!deuda)return;
+
+
+const nuevo=prompt(
+"Nuevo saldo actual:",
+deuda.saldo
+);
+
+
+if(nuevo===null)return;
+
+
+const valor=Number(nuevo);
+
+if(isNaN(valor)||valor<0)return;
+
+
+deuda.saldo=valor;
+
+guardar();
+
+}
+
+
+function mostrar(id,texto,tipo){
+
+const elemento=document.getElementById(id);
+
+elemento.className="message "+tipo;
+
+elemento.textContent=texto;
+
+}
+
+
+function programarWhatsApp(){
+
+const deudaId=
+document.getElementById("deudaWhatsApp").value;
+
+const deuda=deudas.find(
+d=>d.id===deudaId
+);
+
+const telefono=
+document.getElementById("telefono").value.trim();
+
+const fecha=
+document.getElementById("fechaWhatsApp").value;
+
+const consentimiento=
+document.getElementById("consentimiento").checked;
+
+if(!deuda||!telefono||!fecha||!consentimiento){
+
+mostrar(
+"mensajeWhatsApp",
+"Completa todos los campos y acepta recibir el recordatorio.",
+"error"
+);
+
+return;
+
+}
+
+
+/*
+  Esta función está preparada para el backend.
+
+  Cuando conectemos Twilio, aquí se hará:
+
+  POST /api/whatsapp/schedule
+
+  con los datos de la deuda y del destinatario.
+
+  Las credenciales de Twilio NUNCA deben estar
+  dentro de esta página.
+*/
+
+
+const mensaje=
+
+"Recordatorio guardado para "+deuda.nombre+
+" por "+dinero(deuda.mensual)+
+" el "+new Date(fecha).toLocaleString("es-MX")+
+". El envío automático de WhatsApp requiere conectar el servidor.";
+
+mostrar(
+"mensajeWhatsApp",
+mensaje,
+"success"
+);
+
+}
+
+
+function renderizar(){
+
+let saldoTotal=0;
+let pagadoTotal=0;
+let mensualTotal=0;
+let interesesTotal=0;
+
+
+deudas.forEach(deuda=>{
+
+saldoTotal+=deuda.saldo;
+
+pagadoTotal+=
+deuda.original-deuda.saldo;
+
+mensualTotal+=deuda.mensual;
+
+deuda.abonos.forEach(
+abono=>{
+interesesTotal+=abono.interes;
+}
+);
+
+});
+
+
+document.getElementById("totalSaldo")
+.textContent=dinero(saldoTotal);
+
+document.getElementById("totalPagado")
+.textContent=dinero(pagadoTotal);
+
+document.getElementById("totalMensual")
+.textContent=dinero(mensualTotal);
+
+document.getElementById("totalIntereses")
+.textContent=dinero(interesesTotal);
+
+
+const lista=
+document.getElementById("listaDeudas");
+
+
+if(!deudas.length){
+
+lista.innerHTML=
+'<div class="empty">Aún no tienes deudas registradas.</div>';
+
+}else{
+
+lista.innerHTML=deudas.map(
+deuda=>{
+
+const progreso=
+deuda.original>0
+?
+Math.min(
+100,
+Math.max(
+0,
+((deuda.original-deuda.saldo)/
+deuda.original)*100
+)
+)
+:0;
+
+
+return `
+
+<div class="debt">
+
+<div class="debt-header">
+
+<div>
+
+<div class="debt-name">
+${escapar(deuda.nombre)}
+</div>
+
+<div class="muted">
+${escapar(deuda.tipo)}
+· Interés ${deuda.interes}%
+</div>
+
+<div class="muted">
+Vencimiento:
+${deuda.vencimiento||"Sin fecha"}
+</div>
+
+</div>
+
+<div>
+
+<span class="badge">
+${progreso.toFixed(0)}% pagado
+</span>
+
+<div class="balance">
+${dinero(deuda.saldo)}
+</div>
+
+</div>
+
+</div>
+
+<div class="progress">
+<div
+class="progress-bar"
+style="width:${progreso}%"
+></div>
+</div>
+
+<div class="actions">
+
+<button
+class="secondary"
+onclick="editarSaldo('${deuda.id}')">
+Editar saldo
+</button>
+
+<button
+class="danger"
+onclick="eliminarDeuda('${deuda.id}')">
+Eliminar
+</button>
+
+</div>
+
+</div>
+
+`;
+
+}
+).join("");
+
+}
+
+
+actualizarSelects();
+
+actualizarCalendario();
+
+actualizarHistorial();
+
+}
+
+
+function actualizarSelects(){
+
+const opciones=
+deudas.map(
+d=>
+`<option value="${d.id}">
+${escapar(d.nombre)}
+</option>`
+).join("");
+
+
+document.getElementById("deudaAbono")
+.innerHTML=
+opciones||
+'<option value="">No hay deudas</option>';
+
+
+document.getElementById("deudaWhatsApp")
+.innerHTML=
+opciones||
+'<option value="">No hay deudas</option>';
+
+}
+
+
+function actualizarCalendario(){
+
+const cuerpo=
+document.getElementById("calendario");
+
+
+const ordenadas=
+[...deudas].sort(
+(a,b)=>
+(a.vencimiento||"9999")
+.localeCompare(b.vencimiento||"9999")
+);
+
+
+if(!ordenadas.length){
+
+cuerpo.innerHTML=
+'<tr><td colspan="3" class="empty">No hay pagos registrados.</td></tr>';
+
+return;
+
+}
+
+
+cuerpo.innerHTML=
+ordenadas.map(
+d=>
+`<tr>
+<td>${escapar(d.nombre)}</td>
+<td>${d.vencimiento||"—"}</td>
+<td>${dinero(d.mensual)}</td>
+</tr>`
+).join("");
+
+}
+
+
+function actualizarHistorial(){
+
+const historial=
+document.getElementById("historial");
+
+
+const registros=[];
+
+
+deudas.forEach(
+deuda=>{
+
+deuda.abonos.forEach(
+abono=>{
+
+registros.push({
+
+deuda:deuda.nombre,
+monto:abono.monto,
+interes:abono.interes,
+fecha:abono.fecha
+
+});
+
+});
+
+});
+
+
+registros.sort(
+(a,b)=>
+b.fecha.localeCompare(a.fecha)
+);
+
+
+if(!registros.length){
+
+historial.innerHTML=
+'<div class="empty">Todavía no hay abonos.</div>';
+
+return;
+
+}
+
+
+historial.innerHTML=
+registros.map(
+r=>
+`
+<div class="debt">
+
+<div class="debt-header">
+
+<div>
+<b>${escapar(r.deuda)}</b>
+<div class="muted">${r.fecha}</div>
+</div>
+
+<div>
+<div class="balance">${dinero(r.monto)}</div>
+<div class="muted">
+Interés: ${dinero(r.interes)}
+</div>
+</div>
+
+</div>
+
+</div>
+`
+).join("");
+
+}
+
+
+renderizar();
+
+
+</script>
+
+</body>
+</html>
